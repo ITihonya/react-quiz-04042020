@@ -1,0 +1,16 @@
+.Layout {
+    /*100vh забирает всю высоту нашего экрана,которая доступна*/
+    height: 100vh;
+    display: flex;
+    /*column для того чтобы в колонке выстроить все внутр.элементы*/
+    flex-direction: column;
+
+
+}
+
+.Layout main {
+    display: flex;
+    flex-direction: column;
+    /*Для того чтобы тег main занимал всю доступную высоту*/
+    flex-grow: 1;
+}
