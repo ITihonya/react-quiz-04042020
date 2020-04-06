@@ -5,19 +5,21 @@ import AnswersList from "./AnswersList/AnswersList";
 import classes from './ActiveQuiz.module.css'
 
 //сщздаём функцию которая будет получать некоторые параметры props и возвращать jsx
-const ActiveQuiz = props => (
+const ActiveQuiz = props =>
+    (
     <div className={classes.ActiveQuiz}>
         <p className={classes.Question}>
             <span>{/*здесь будем выводить сам вопрос*/}
                 <strong>{/*здесь будем выводить номер вопроса*/}
                     2.
                 </strong>&nbsp;
-                Как дела?
+                {props.question}
             </span>
             <small>2 из 12</small>
         </p>
         <AnswersList
             answers={props.answers}
+            onAnswerClick={props.onAnswerClick}
         >
 
         </AnswersList>
@@ -25,3 +27,4 @@ const ActiveQuiz = props => (
 )
 //потом по умолчанию мы вернём данную функцию
 export default ActiveQuiz
+

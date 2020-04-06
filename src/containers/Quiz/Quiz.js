@@ -8,23 +8,33 @@ class Quiz extends Component {
         и каждый элемент этого массива будет являться объектом*/
         quiz: [
             {
+                question: 'Какого цвета небо?',
+                rightAnswerId: 2,
                 answers: [
-                    {text: 'Вопрос 1'},
-                    {text: 'Вопрос 2'},
-                    {text: 'Вопрос 3'},
-                    {text: 'Вопрос 4'}
+                    {text: 'Чёрный', id: 1},
+                    {text: 'Синий', id: 2},
+                    {text: 'Красный', id: 3},
+                    {text: 'Зелёный',id: 4}
                 ]
             }
         ]
 }
+
+onAnswerClickHandler = (answerId) => {
+    console.log('AnswerId: ', answerId)
+}
     render() {
+
         //возвращаем jsx...обернём всё в div он и будет являться корневым для нашего приложения
         return (
             <div className={classes.Quiz}>
                 <div className={classes.QuizWrapper}>
-                    <h1>Quiz</h1>
-                    <ActiveQuiz>{/*здесь будем рендерить компонент ActiveQuiz */}
+                    <h1>Ответьте на все вопросы</h1>
+                    <ActiveQuiz
+                        question={this.state.quiz[0].question}
                         answers={this.state.quiz[0].answers}
+                        onAnswerClick={this.onAnswerClickHandler}
+                    >{/*здесь будем рендерить компонент ActiveQuiz */}
                     </ActiveQuiz>
                 </div>
             </div>

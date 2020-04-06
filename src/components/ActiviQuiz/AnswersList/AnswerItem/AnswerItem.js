@@ -6,7 +6,10 @@ import classes from './AnswerItem.module.css'
 поэтому сначала тело функции в {} скобках, а уже потом возвращаем jsx ... return()*/
 const AnswerItem = props => {
     return(
-        <li className={classes.AnswerItem}>{/*каждый выводимый элемент в компоненте AnswersList должен быть тегом li*/}
+        <li
+            className={classes.AnswerItem}
+            onClick={() => props.onAnswerClick(props.answer.id)}
+        >{/*каждый выводимый элемент в компоненте AnswersList должен быть тегом li*/}
             {props.answer.text}{/*так как мы принимаем props то пишем props.answer(название произвольное...answer=ответ
             его мы будем передавать параметром в компоненте AnswersList в return)
             и .text чтобы отобразить текст*/}

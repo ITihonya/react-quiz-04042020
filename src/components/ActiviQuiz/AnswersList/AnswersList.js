@@ -12,19 +12,23 @@ import classes from './AnswersList.module.css'
           На входе в map мы получаем answer(вопрос из массива(итерируемый элемент) и его индекс(ключ))*/
 /*в методе map мы должны вернуть jsx и в нашем случае это быдет jsx с тегом AnswerItem
             ...туда же мы будем передавать какие то параметры*/
-const AnswersList = props => (
+
+const AnswersList = props =>{
+    return(
     <ul className={classes.AnswersList}>
         { props.answers.map((answer, index) => {
             return(
                 <AnswerItem
+                    key={index}
                     answer={answer}
+                    onAnswerClick={props.onAnswerClick}
                 >
 
                 </AnswerItem>
             )
         })}
     </ul>
-)
+)}
 
 //экспортируем по дефолту наружу
 export default AnswersList
