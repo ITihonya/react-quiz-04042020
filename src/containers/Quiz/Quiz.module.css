@@ -1,4 +1,4 @@
- .Quiz {
+.Quiz {
       display: flex;
       justify-content: center;
       padding-top: 100px;
@@ -11,7 +11,7 @@
      color: #fff;
      margin-left: 10px;
  }
-/*Wrapper обёртка для div*/
+/*Wrapper обёртка для div контент*/
  .QuizWrapper {
      width: 600px;
  }
