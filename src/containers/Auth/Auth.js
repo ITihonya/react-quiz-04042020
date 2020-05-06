@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import classes from './Auth.module.css'
-import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
+import is from 'is_js'
+import axios from 'axios'
+import Button from "../../components/UI/Button/Button";
 
-function validateEmail(email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-}
 
 class Auth extends Component {
     //Формируем СВОЮ валидацию!!!Формируем state с переменной formControls для валидации данных.
     state = {
+        //нам нужно изменять данное состояние когда мы вписываем что то в контролы(input)
+        isFormValid: false,
         // в переменной formControls мы будем работать с контролами email и password
         //здеь мы проработаем всё детально без дополнительных облегчающих функцийй
         // а позжее в QuizCreator поговорим как можем это оптимизировать и создадим свой маленький Framework
@@ -82,6 +82,7 @@ class Auth extends Component {
                     touched={control.touched}
                     label={control.label}
                     //!! приведение к булевому значению
+                    //отвечает за то,нужно ли нам валидировать input или же нет
                     shouldValidate={!!control.validation}
                     erroprMessage={control.errorMessage}
                     //этот параметр следит за изменениями в input...редактирование inputa
@@ -90,12 +91,42 @@ class Auth extends Component {
             )
         })
     }
+//фуекция для того чтобы логиниться
+    loginHandler =  async () => {
+        //так как  нас метод post мы должны передать три параметра, для этого создаём объект authData
+        const authData = {
+            email: this.state.formControls.email.value,
+            password: this.state.formControls.password.value,
+            returnSecureToken: true
 
-    loginHandler = () => {
-
+        }
+        //для проверки обращения к серверу + отлов ошибок
+        try {
+            const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBxuu9JJBB8q_q-qj-5HQklfCvRevQlfDg',authData)
+            console.log(response)
+            console.log(response.data)
+        }catch (e) {
+            console.log(e)
+        }
     }
+//функция регистрации.Отправляем post запрос на сервер для добавления пользователя
+    registrHandler = async () => {
+        //так как  нас метод post мы должны передать три параметра, для этого создаём объект authData
+        const authData = {
+            email: this.state.formControls.email.value,
+            password: this.state.formControls.password.value,
+            returnSecureToken: true
 
-    registrHandler = () => {
+        }
+        //для проверки обращения к серверу + отлов ошибок
+        try {
+            const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBxuu9JJBB8q_q-qj-5HQklfCvRevQlfDg',authData)
+            console.log(response)
+            console.log(response.data)
+        }catch (e) {
+            console.log(e)
+        }
+
 
     }
     //эта функция будет принимать event и всё что она будет делать...это "эвентить" стандартное поведение формы
@@ -118,7 +149,7 @@ class Auth extends Component {
         }
 
         if(validation.email){
-            isValid = validateEmail (value) && isValid
+            isValid = is.email(value) && isValid
         }
 
         if(validation.minLength) {
@@ -131,7 +162,6 @@ class Auth extends Component {
 //функция изменения состояния input
     //чтобы грамонто отображались все поля и валидировались в нашей форме
     onChangeHandler = (event, controlName) => {
-        console.log(`${controlName}:`, event.target.value)
         //Объекты не должны мутироваться а мы создаем копии и их изменяем с помощью setState
         /*переменная formControls по названию объекта в state.И делаем из него копию объекта formControls
         с помощью оператора spread(...),для будующего изменения state*/
@@ -149,9 +179,19 @@ class Auth extends Component {
         control.valid = this.validateControl(control.value, control.validation)
 
         formControls[controlName] = control
+        //для проверки валидности формы
+        let isFormValid = true
+        //получаем ключи объекта formControls(это или email или password).
+        // Далее для каждого элемента(name),полученного массива мы переопределяем переменную isFormValid
+        Object.keys(formControls).forEach(name => {
+            /*если formControls[name].valid(true) && isFormValid(true),
+            то isFormValid тоже true в противном случае false(тогда блокируем кнопку отправки формы(Войти и Зарегистрироваться),
+            устанавливая параметр disabled в значение true)*/
+            isFormValid = formControls[name].valid && isFormValid
+        })
 
         this.setState({
-            formControls
+            formControls, isFormValid
         })
     }
 
@@ -175,6 +215,9 @@ class Auth extends Component {
                         <Button
                             type={'success'}//тип для класса
                             onClick={this.loginHandler}
+                            /*таким образом отключаем кнопку если форма не валидна.
+                            disabled в начении true*/
+                            disabled={!this.state.isFormValid}
                         >
                             Войти
                         </Button>
@@ -182,6 +225,9 @@ class Auth extends Component {
                         <Button
                             type={'primary'}//тип для класса
                             onClick={this.registrHandler}
+                            /*таким образом отключаем кнопку если форма не валидна.
+                            disabled в начении true*/
+                            disabled={!this.state.isFormValid}
                         >
                             Зарегистрироваться
                         </Button>

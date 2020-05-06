@@ -1,7 +1,7 @@
 import React from "react";
 import classes from './Input.module.css'
 
-// Реализуем функцию кот.будет проверять есть ли у нас в inpet какая-нить ошибка или нет
+// Реализуем функцию кот.будет проверять есть ли у нас в input какая-нить ошибка или нет
 // Нам ненужны все свойства которые лежат в данном объекте props(type,id,value,onChange и т.д.)
 // нам нужны всего 3 параметра...поэтому делаем деструктуризацию...вместо (props)...({})
 //1. valid будет определять при валидации формы
@@ -18,7 +18,6 @@ function isInvalid({valid, touched, shouldValidate}) {
 
 
 const Input = props => {
-    // console.log(this.props.shouldValidate)
     /* так как этот компонент будет универсальным то нам нужна переменная отвечающая за тип input(text,number...)
     данный тип будет определяться из props.type или если этот тип не определён то по умолчанию 'text'*/
     const inputType = props.type || 'text'
@@ -27,8 +26,6 @@ const Input = props => {
     /*данная переменная будет формировать уникальный id для input
     и определяться строкой `${inputType}-${Math.random()}`*/
     const htmlFor = `${inputType}-${Math.random()}`
-
-    //Для проверки.Данный if будет выполняться всегда если true, но у нас...
     // если у нас данный input не валидный isInvalid === true, а проверять мы его будем по параметрам props
     if(isInvalid(props)){
         cls.push(classes.invalid)
