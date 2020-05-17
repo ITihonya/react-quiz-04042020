@@ -3,21 +3,15 @@ import React, {Component} from "react";
 import classes from './Drawer.module.css'
 import {NavLink} from "react-router-dom";
 import Backdrop from "../../UI/Backdrop/Backdrop";
-/*список ссылок формируем в виде объекта
-to:путь, label: название страницы, exact: false или true(если true то только точное совпадение адреса)*/
-const link = [
-    {to:'/', label: 'Список', exact: true},
-    {to:'/Auth', label: 'Авторизация', exact: false},
-    {to:'/quiz-creator', label: 'Создать тест', exact: false}
-]
+
 class Drawer extends Component{
     clickHandler = () => {
         //вызываем функцию
         this.props.onClose()
     }
     //функция перебирает элементы(ссылки) выводимые в компоненте Drawer и выводит в виде списка li
-    renderLink(){
-        return link.map((link, index) => {
+    renderLink(links){
+        return links.map((link, index) => {
             return (
                 <li key={index}>
                     {/*Для роутинга мы должны использовать для ссылок не тег <a> а компонент NavLink*/}
@@ -45,6 +39,20 @@ class Drawer extends Component{
             //добавляем новый класс
             cls.push(classes.close)
         }
+
+        /*список ссылок формируем в виде объекта
+        to:путь, label: название страницы, exact: false или true(если true то только точное совпадение адреса)*/
+        const links = [
+            {to:'/', label: 'Список', exact: true}
+        ]
+        //если мы авторизованы
+        if(this.props.isAuthenticated){
+            links.push({to:'/quiz-creator', label: 'Создать тест', exact: false})
+            links.push({to:'/logout', label: 'Выйти', exact: false})
+        //если не авторизованы
+        }else {
+            links.push({to:'/Auth', label: 'Авторизация', exact: false})
+        }
         //что будет находится в самом render.Верстка для данного компонента.
         return (
             <React.Fragment>
@@ -52,7 +60,7 @@ class Drawer extends Component{
                 <nav className={cls.join(' ')}>
                     {/*внутри будет находится список ul где мы будет выводит список всех наших ссылок*/}
                     <ul>
-                        {this.renderLink()}
+                        {this.renderLink(links)}
                     </ul>
                 </nav>
                 {/*проверяем,если меню открыто(isOpen = true) показываем Backdrop(затемняем контент)

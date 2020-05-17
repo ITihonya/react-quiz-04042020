@@ -6,6 +6,9 @@ import {createControl,validate,validateForm} from "../../form/formFramework";
 import Auxiliary from '../../hoc/Auxiliary/Auxiliary'
 import Select from "../../components/UI/Select/Select";
 import axios from '../../axios/axios-quiz'
+import {connect} from "react-redux";
+import quiz from "../../store/reducers/quiz";
+import {createQuizQuestion, finishCreateQuiz} from "../../store/actions/create";
 
 
 class QuizCreator extends Component {
@@ -16,25 +19,20 @@ class QuizCreator extends Component {
         rightAnswerId: 1,
         /*ТЕСТ КОТОРЫЙ МЫ СОЗДАЁМ МОЖЕТ СОСТОЯТЬ ИЗ НЕСКОЛЬКИХ ВОПРОСОВ и здесь мы будем хранить все вопросы к тесту
         и в методе addHandler будем добавлять эти вопросы в массив quiz*/
-        quiz: [],
         formControls: createFormControl()
     }
     //функция отменяющее стандартное поведение формы
     submitHandler = event => {
         event.preventDefault()
     }
-
+    //добавление нового вопроса в тест
     addQuestionHandler = () => {
-        //создаём копию массива quiz с помощью метода concat(без параметров) чтобы защититься от мутаций
-        const quiz = this.state.quiz.concat()
-        //данную переменную будем использовать для id
-        const index = quiz.length + 1
         //деструктуризация данных для сокращения записи в параметрах answers
         const {question, option1, option2, option3, option4} = this.state.formControls
         //далее нам нужно сформировать объект каждого из вопросов и положить его в quiz
         const questionItem = {
             question: question.value,
-            id: index,
+            id: this.props.newQuiz.length +1,
             rightAnswerId: this.state.rightAnswerId,
             //ответы будут представлены ввиде массива объектов
             //которые будут состоять из двух параметров text и id
@@ -47,12 +45,10 @@ class QuizCreator extends Component {
                 {text: option4.value, id: option4.id},
             ]
         }
-        //теперь полность сформированный объект questionItem добавляем в массив quiz
-        quiz.push(questionItem)
+        //добавление нового вопроса в тест
+        this.props.createQuizQuestion(questionItem)
         //далее изменяем состояние state на основе новых данных
         this.setState({
-            //так как ключ и значение совпадают можем записать короче, просто quiz
-            quiz: quiz,
             //после этого обнуляем состояние страницы...сделать её новой,чистой и нетронутой.но уже с новым вопросом
             isFormValid: false,
             rightAnswerId: 1,
@@ -61,8 +57,9 @@ class QuizCreator extends Component {
         //после этого обнуляем состояние страницы...сделать её новой,чистой и нетронутой
 
     }
+    //завершение добавления теста
     //  Делаем функцию асинхронной с помощью async
-    createQuizHandler = async (event) => {
+    createQuizHandler = (event) => {
         // //используем post запрос для добавления данных в БД
         // // первым параметром передаём Url, вторым параметром массив куда будем всё складывать quiz [](this.state.quiz)
         // //т.к. axios возвращает pomise то используем метод then для получения ответа и
@@ -75,27 +72,17 @@ class QuizCreator extends Component {
         //         console.log(error)
         //     })
         //ТЕПЕРЬ МОЖЕМ ВОСПОЛЬЗОВАТЬСЯ СОВРЕМЕННЫМ СИНТАКСИСОМ...ТО ЧТО ВВЕРХУ
-        try {
-            //чтобы правильно определить объект response перед опрератором перед асинхр.событием axios ставим await
-            //данный метод axios.post вернёт нам pomise и с помощью await мы распарсим данный pomise и положим в response
-            //метод post принимает 2 параметра...это url и массив который мы создали в state...а именно quiz
-            const response = await axios.post('quizes.json', this.state.quiz)
-            //если ошибок нет то выводим данные
-            console.log(response.data)
-            //В случае успешного выполнения запроса обнуляем страницу
-            this.setState({
-                //так как ключ и значение совпадают можем записать короче, просто quiz
-                quiz: [],
-                //после этого обнуляем состояние страницы...сделать её новой,чистой и нетронутой.но уже с новым вопросом
-                isFormValid: false,
-                rightAnswerId: 1,
-                formControls: createFormControl()
-            })
-            //если ошибка есть выводим ошибку
-        } catch (e) {
-            console.log(e)
-        }
 
+        //В случае успешного выполнения запроса обнуляем страницу
+        this.setState({
+            //так как ключ и значение совпадают можем записать короче, просто quiz
+            quiz: [],
+            //после этого обнуляем состояние страницы...сделать её новой,чистой и нетронутой.но уже с новым вопросом
+            isFormValid: false,
+            rightAnswerId: 1,
+            formControls: createFormControl()
+        })
+        this.props.finishCreateQuiz()
     }
     //функция изменения input
     сhangeHandler = (value, controlName) => {
@@ -187,7 +174,7 @@ class QuizCreator extends Component {
                        <Button
                            type={'success'}
                            onClick={this.createQuizHandler}
-                           disabled={this.state.quiz.length === 0}/*если нет вопросов в нашем тесте кнопка будет неактивна*/
+                           disabled={this.props.newQuiz.length === 0}/*если нет вопросов в нашем тесте кнопка будет неактивна*/
                        >
                            Создать тест
                        </Button>
@@ -198,8 +185,23 @@ class QuizCreator extends Component {
         );
     }
 }
+function mapStateToProps(state) {
+    return {
+        newQuiz: state.create.quiz
+    }
 
-export default QuizCreator;
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        //функция отвечающая за обавление вопроса в тест
+        createQuizQuestion: item => dispatch(createQuizQuestion(item)),
+        //функция отвечающая за добавление теста на сервак
+        finishCreateQuiz: () => dispatch(finishCreateQuiz())
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(QuizCreator);
 
 
 

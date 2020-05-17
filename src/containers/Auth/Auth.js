@@ -4,6 +4,8 @@ import Input from "../../components/UI/Input/Input";
 import is from 'is_js'
 import axios from 'axios'
 import Button from "../../components/UI/Button/Button";
+import {connect} from "react-redux";
+import {auth} from "../../store/actions/auth";
 
 
 class Auth extends Component {
@@ -92,42 +94,22 @@ class Auth extends Component {
         })
     }
 //фуекция для того чтобы логиниться
-    loginHandler =  async () => {
-        //так как  нас метод post мы должны передать три параметра, для этого создаём объект authData
-        const authData = {
-            email: this.state.formControls.email.value,
-            password: this.state.formControls.password.value,
-            returnSecureToken: true
-
-        }
-        //для проверки обращения к серверу + отлов ошибок
-        try {
-            const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBxuu9JJBB8q_q-qj-5HQklfCvRevQlfDg',authData)
-            console.log(response)
-            console.log(response.data)
-        }catch (e) {
-            console.log(e)
-        }
+    loginHandler = () => {
+        this.props.auth(
+            this.state.formControls.email.value,
+            this.state.formControls.password.value,
+            //т.к. нам не нужно региться а только залогиниться, то значение 3-го параметра true
+            true
+        )
     }
 //функция регистрации.Отправляем post запрос на сервер для добавления пользователя
-    registrHandler = async () => {
-        //так как  нас метод post мы должны передать три параметра, для этого создаём объект authData
-        const authData = {
-            email: this.state.formControls.email.value,
-            password: this.state.formControls.password.value,
-            returnSecureToken: true
-
-        }
-        //для проверки обращения к серверу + отлов ошибок
-        try {
-            const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBxuu9JJBB8q_q-qj-5HQklfCvRevQlfDg',authData)
-            console.log(response)
-            console.log(response.data)
-        }catch (e) {
-            console.log(e)
-        }
-
-
+    registrHandler = () => {
+        this.props.auth(
+            this.state.formControls.email.value,
+            this.state.formControls.password.value,
+            //т.к. нам нужно региться, то значение 3-го параметра true
+            false
+        )
     }
     //эта функция будет принимать event и всё что она будет делать...это "эвентить" стандартное поведение формы
     submitHandler = (event) => {
@@ -240,6 +222,15 @@ class Auth extends Component {
     }
 }
 
-export default Auth;
+function mapDispatchToProps(dispatch){
+    return {
+        //isLogin этот параметр будет отвечать за то,нужно нам логиниться или регистрироваться
+        auth: (email,password,isLogin) => dispatch(auth(email,password,isLogin))
+
+    }
+}
+/*так как у нас нет никакого state для Redux
+то первым параметром мы передаём null вместо mapStateToProps*/
+export default connect(null, mapDispatchToProps)(Auth)
 
 

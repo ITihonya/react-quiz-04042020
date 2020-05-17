@@ -3,6 +3,7 @@ import React, {Component} from "react";
 import classes from './Layout.module.css'
 import MenuToggle from "../../components/Navigation/MenuToggle/MenuToggle";
 import Drawer from "../../components/Navigation/Drawer/Drawer";
+import {connect} from "react-redux";
 //создаём класс Layout(произвольное название) который будет наследоваться от класса Component
 class Layout extends Component{
     state = {
@@ -28,6 +29,7 @@ class Layout extends Component{
 
             <div className={classes.Layout}>{/*стилизуем наш корневой div с омощью переменной classes*/}
                 <Drawer
+                isAuthenticated={this.props.isAuthenticated}
                 isOpen={this.state.menu}//прокидываем в компонент Drawer статус меню
                 onClose={this.menuCloseHandler}
                 />
@@ -45,5 +47,12 @@ class Layout extends Component{
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        isAuthenticated: !!state.auth.token
+    }
+}
+
 //экспортируем наружу класс Layout
-export default Layout
+export default connect (mapStateToProps) (Layout)
